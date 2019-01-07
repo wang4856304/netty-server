@@ -1,5 +1,6 @@
 package com.wj;
 
+import com.wj.context.SpringContext;
 import com.wj.service.MessageHandlerService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -10,6 +11,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.SocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,6 +92,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
         String rev = getMessage(buf);
         SocketChannel socketChannel = (SocketChannel)ctx.channel();
         String clientIp = socketChannel.remoteAddress().getAddress().getHostAddress();
+        String clientId = ctx.channel().id().asLongText();
+        MessageHandlerService messageHandlerService = SpringContext.getBean("messageHandlerServiceImpl", MessageHandlerService.class);
+        messageHandlerService.handlerMsg(clientIp, clientId, rev);
         logger.info("服务器收到客户端" + clientIp + "数据:" + rev);
 
     }
